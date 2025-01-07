@@ -5,7 +5,7 @@
 	type State = {
 		playerCount?: number;
 		playerData?: {
-			role?: 'werewolf' | 'witch' | 'seer' | 'hunter' | 'knight' | 'villager';
+			role?: 'werewolf' | 'king' | 'witch' | 'seer' | 'hunter' | 'knight' | 'villager';
 		}[];
 	};
 	let state = localStore<State>('state', {
@@ -60,6 +60,7 @@
 						}}
 					>
 						<option value="werewolf">狼人</option>
+						<option value="king">狼王</option>
 						<option value="witch">女巫</option>
 						<option value="seer">預言家</option>
 						<option value="hunter">獵人</option>
