@@ -7,6 +7,13 @@ declare global {
 		// interface PageData {}
 		// interface PageState {}
 		// interface Platform {}
+		interface GameState {
+			playerCount: number;
+			playerData: {
+				role: 'werewolf' | 'king' | 'witch' | 'seer' | 'hunter' | 'knight' | 'villager';
+				dead: boolean;
+			}[];
+		}
 	}
 }
 

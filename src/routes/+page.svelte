@@ -1,16 +1,8 @@
 <script lang="ts">
 	import { localStore } from '$lib';
-	import { onMount } from 'svelte';
 
 	type DeepPartial<T> = {
 		[P in keyof T]?: DeepPartial<T[P]>;
-	};
-	type State = {
-		playerCount?: number;
-		playerData?: {
-			role?: 'werewolf' | 'king' | 'witch' | 'seer' | 'hunter' | 'knight' | 'villager';
-			dead: boolean;
-		}[];
 	};
 	let state = localStore<DeepPartial<State>>('state', {
 		playerCount: 12,
