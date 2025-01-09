@@ -12,6 +12,8 @@ declare global {
 			playerData: {
 				role: 'werewolf' | 'king' | 'witch' | 'seer' | 'hunter' | 'knight' | 'villager';
 				dead: boolean;
+				isSheriff: boolean;
+				name: string;
 			}[];
 		}
 	}
