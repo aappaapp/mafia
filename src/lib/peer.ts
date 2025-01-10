@@ -40,7 +40,7 @@ export function hostAcceptCall(state: HostState, peer: Peer) {
 				peer2.media = stream;
 				peer2.context = new AudioContext();
 				peer2.output = peer2.context.createMediaStreamDestination();
-				peer2.context.createMediaStreamSource(stream).connect(peer2.output);
+				// peer2.context.createMediaStreamSource(stream).connect(peer2.output);
 				peer.call(call.peer, peer2.output.stream);
 				const audio = new Audio();
 				audio.autoplay = true;
@@ -66,7 +66,7 @@ export function join(id: string, pin: string) {
 		const peer = new Peer();
 		peer.once('open', () => {
 			const conn = peer.connect(`ap-mafia-${pin}-${id}`);
-			conn.once('open', () => {
+			conn.on('open', () => {
 				resolve([peer, conn]);
 			});
 		});

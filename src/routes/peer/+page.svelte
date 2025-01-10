@@ -14,6 +14,7 @@
 	let peer: import('peerjs').Peer | undefined = $state();
 	let conn: import('peerjs').DataConnection | undefined = $state();
 	let isHost = $state(false);
+	let status = $state('idle');
 	let obj: HostState = $state({
 		peers: [],
 		gameState: {
@@ -35,30 +36,41 @@
 	let pin = $state('1234');
 </script>
 
-<div class="flex">
-	<input type="text" placeholder="Id" bind:value={roomId} />
-	<input type="text" placeholder="Pin" bind:value={pin} />
-</div>
-<div>
-	<button
-		onclick={async () => {
-			peer = await host(obj, roomId, pin);
-			hostAcceptCall(obj, peer);
-			isHost = true;
-		}}>Host</button
-	>
-</div>
-
-<button
-	onclick={async () => {
-		[peer, conn] = await join(roomId, pin);
-		await call(peer, getHostId(roomId, pin));
-		acceptCall(peer);
-	}}>Join</button
->
-
 {#if isHost}
 	<Panel bind:gameState={obj.gameState} />
+{:else if peer}
+	<div>Waiting for host...</div>
 {:else}
-	You are wolfksamdflmasdf
+	<div class="">
+		<h1 class="text-center text-3xl">狼人殺 Online</h1>
+		<div class="flex flex-col items-center gap-2">
+			<label for="roomId" class="text-center text-xl">房間號</label>
+			<input type="text" placeholder="Id" id="roomId" bind:value={roomId} class="b--input" />
+			<label for="pin" class="text-center text-xl">PIN</label>
+			<input type="text" placeholder="Pin" id="pin" bind:value={pin} class="b--input" />
+			<div class="flex gap-2">
+				<button
+					onclick={async () => {
+						peer = await host(obj, roomId, pin);
+						hostAcceptCall(obj, peer);
+						isHost = true;
+					}}
+					class="b--button">Host</button
+				>
+				<button
+					onclick={async () => {
+						status = 'joining';
+						[peer, conn] = await join(roomId, pin);
+						status = 'calling';
+						await call(peer, getHostId(roomId, pin));
+						acceptCall(peer);
+					}}
+					class="b--button">Join</button
+				>
+			</div>
+			<div>
+				Status: {status}
+			</div>
+		</div>
+	</div>
 {/if}

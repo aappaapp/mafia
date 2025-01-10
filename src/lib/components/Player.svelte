@@ -36,6 +36,10 @@
 			<option value="witch">女巫</option>
 			<option value="hunter">獵人</option>
 			<option value="knight">騎士</option>
+			<option value="cupid">Cupid</option>
+			<option value="other1">Other1</option>
+			<option value="other2">Other2</option>
+			<option value="other3">Other3</option>
 			<option value="villager">村民</option>
 		</select>
 	</div>
