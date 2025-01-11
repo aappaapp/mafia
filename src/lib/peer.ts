@@ -15,8 +15,12 @@ export function getHostId(id: string, pin: string) {
 }
 
 export function host(state: HostState, id: string, pin: string) {
-	return new Promise<Peer>((resolve) => {
-		const peer = new Peer(`ap-mafia-${pin}-${id}`);
+	return new Promise<Peer>(async (resolve) => {
+		const peer = new Peer(`ap-mafia-${pin}-${id}`, {
+			config: {
+				iceServers: await (await fetch('/api/get-ice-servers')).json()
+			}
+		});
 		console.log(peer);
 		peer.once('open', () => {
 			resolve(peer);
@@ -62,8 +66,12 @@ export function acceptCall(peer: Peer) {
 }
 
 export function join(id: string, pin: string) {
-	return new Promise<[Peer, DataConnection]>((resolve) => {
-		const peer = new Peer();
+	return new Promise<[Peer, DataConnection]>(async (resolve) => {
+		const peer = new Peer({
+			config: {
+				iceServers: await (await fetch('/api/get-ice-servers')).json()
+			}
+		});
 		peer.once('open', () => {
 			const conn = peer.connect(`ap-mafia-${pin}-${id}`);
 			conn.on('open', () => {
