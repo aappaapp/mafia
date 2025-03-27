@@ -65,7 +65,7 @@ if (browser) {
 		const sqlite3 = await sqlite3InitModule();
 		db.db = new sqlite3.oo1.JsStorageDb('local');
 		init(db.db);
-		start(db.db, 10);
+		start(db.db, 15);
 
 		// @ts-ignore
 		window.db = db;
