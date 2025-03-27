@@ -1,52 +1,78 @@
 <script lang="ts">
+	import type { Database } from '@sqlite.org/sqlite-wasm';
+	import Button from './Button.svelte';
+	import { rerender, triggerRerender } from '$lib/db.svelte';
+
 	type Props = {
-		playerNumber: number;
-		data: App.GameState['playerData'][number];
+		db: Database;
+		id: number;
 	};
 
-	let { playerNumber, data }: Props = $props();
-	$effect.pre(() => {
-		if (!data.name) {
-			data.name = `玩家${playerNumber}`;
-		}
+	let { db, id }: Props = $props();
+	let data: {
+		role: string;
+		isAlive: boolean;
+		name: string;
+	} = $state({
+		role: 'villager',
+		isAlive: true,
+		name: ''
 	});
+	let roles: {
+		id: string;
+		name: string;
+	}[] = $state([]);
+	$effect(() => {
+		rerender[`player${id}`];
+		data = db
+			.exec(`SELECT role, is_alive, name FROM player WHERE id = ${id}`, {
+				returnValue: 'resultRows'
+			})
+			.map((v) => ({ role: v[0], isAlive: v[1] === 1, name: v[2] }) as typeof data)[0];
+		roles = db
+			.exec(`SELECT id, name FROM roles`, {
+				returnValue: 'resultRows'
+			})
+			.map((v) => ({ id: v[0], name: v[1] }) as (typeof roles)[number]);
+	});
+
+	let expanded = $state(false);
 </script>
 
-<div
-	class="flex flex-col items-center rounded-lg border-2 border-black p-5 {data.dead
-		? 'bg-black text-white'
-		: ''}"
->
-	<div>
-		<span>#{playerNumber}</span>
+{#key rerender[`player${id}`]}
+	<div class="{data.isAlive ? 'bg-foreground' : 'bg-dead'} m-5 rounded-2xl p-5">
+		<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+		<div onclick={() => (expanded = !expanded)}>{data.name}</div>
+		{#if expanded}
+			<div>
+				<Button
+					onclick={() => {
+						db.exec(
+							`UPDATE player SET name = '${prompt('請輸入名字', data.name)}' WHERE id = ${id}`
+						);
+						triggerRerender(`player${id}`);
+					}}>Rename</Button
+				>
+				<Button
+					onclick={() => {
+						db.exec(`UPDATE player SET is_alive = 0 WHERE id = ${id}`);
+						triggerRerender(`player${id}`);
+					}}>Kill</Button
+				>
+				<select
+					name="role"
+					id="role"
+					value={data.role}
+					onchange={(e) => {
+						db.exec(`UPDATE player SET role = '${e.currentTarget.value}' WHERE id = ${id}`);
+						triggerRerender(`player${id}`);
+					}}
+				>
+					{#each roles as role}
+						<option value={role.id}>{role.name}</option>
+					{/each}
+				</select>
+			</div>
+		{/if}
 	</div>
-	<div>
-		<input
-			type="text"
-			value={data.name}
-			onchange={(e) => (data.name = e.currentTarget.value)}
-			class="w-full text-center"
-		/>
-	</div>
-	<div>
-		<select bind:value={data.role} class="bg-transparent">
-			<option value="king">狼王</option>
-			<option value="werewolf">狼人</option>
-			<option value="seer">預言家</option>
-			<option value="witch">女巫</option>
-			<option value="hunter">獵人</option>
-			<option value="knight">騎士</option>
-			<option value="cupid">Cupid</option>
-			<option value="other1">Other1</option>
-			<option value="other2">Other2</option>
-			<option value="other3">Other3</option>
-			<option value="villager">村民</option>
-		</select>
-	</div>
-	<div>
-		<button onclick={() => (data.dead = !data.dead)}>{data.dead ? '☠️' : '😀'}</button>
-		<button onclick={() => (data.isSheriff = !data.isSheriff)}
-			>{data.isSheriff ? '👮' : '🎩'}</button
-		>
-	</div>
-</div>
+{/key}
