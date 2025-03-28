@@ -4,11 +4,18 @@
 </script>
 
 {#key rerender.all}
-	<div class="bg-primary w-full rounded-b-2xl py-5 text-center text-2xl font-bold">Night 2</div>
+	<div class="bg-primary flex w-full rounded-b-2xl p-5 text-center text-2xl font-bold">
+		<button onclick={() => (db.state.phase = Math.max(db.state.phase - 1, 0))}>&lArr;</button>
+		<span class="flex-1">
+			{db.state.phase % 2 === 0 ? 'Day' : 'Night'}
+			{Math.floor(db.state.phase / 2) + 1}
+		</span>
+		<button onclick={() => db.state.phase++}>&rArr;</button>
+	</div>
 
 	<!-- <h1 class=" text-center text-4xl">狼人殺</h1> -->
 	{#each db.db?.exec(`SELECT id FROM player`, { returnValue: 'resultRows' }) ?? [] as [id]}
-		<Player db={db.db!} id={id as number} />
+		<Player id={id as number} />
 	{/each}
 {/key}
 
